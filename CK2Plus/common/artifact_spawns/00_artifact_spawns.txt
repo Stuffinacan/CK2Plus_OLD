@@ -2,10 +2,9 @@
 #### QUALITY 5  ####
 ####################
 
-
 crown_hre = {
-    max_amount = 1
-    spawn_date = 800.12.25
+	max_amount = 1
+	spawn_date = 800.12.25
 
 	spawn_chance = {
 		value = 100
@@ -15,7 +14,7 @@ crown_hre = {
 		}
 	}
 
-    weight = {
+	weight = {
 		value = 0
 		additive_modifier = {
 			value = 100
@@ -24,16 +23,16 @@ crown_hre = {
 			}
 		}
 	}
-    artifacts = {
-        crown_hre = {
-            value = 1
-        }
-    }
+	artifacts = {
+		crown_hre = {
+			value = 1
+		}
+	}
 }
 
 iron_crown_of_lombardy = {
-    max_amount = 1
-    spawn_date = -1.1.1
+	max_amount = 1
+	spawn_date = -1.1.1
 
 	spawn_chance = {
 		value = 100
@@ -47,40 +46,40 @@ iron_crown_of_lombardy = {
 		}
 	}
 
-    weight = {
+	weight = {
 		value = 0
 		additive_modifier = {
 			value = 100
 			primary_title = {
 				title = k_italy
 			}
-			NOT = { year = 1000 }
+			year < 1000
 		}
 		additive_modifier = {
 			value = 100
 			primary_title = {
 				title = k_lombardy
 			}
-			NOT = { year = 1000 }
+			year < 1000
 		}
 		additive_modifier = {
 			value = 100
 			primary_title = {
 				title = e_hre
 			}
-			year = 1000
+			year >= 1000
 		}
 	}
-    artifacts = {
-        iron_crown_of_lombardy = {
-            value = 1
-        }
-    }
+	artifacts = {
+		iron_crown_of_lombardy = {
+			value = 1
+		}
+	}
 }
 
 crown_byzantine = {
-    max_amount = 1
-    spawn_date = -1.1.1
+	max_amount = 1
+	spawn_date = -1.1.1
 
 	spawn_chance = {
 		value = 100
@@ -91,7 +90,7 @@ crown_byzantine = {
 		}
 	}
 
-    weight = {
+	weight = {
 		value = 0
 		additive_modifier = {
 			value = 100
@@ -100,11 +99,11 @@ crown_byzantine = {
 			}
 		}
 	}
-    artifacts = {
-        crown_byzantine = {
-            value = 1
-        }
-    }
+	artifacts = {
+		crown_byzantine = {
+			value = 1
+		}
+	}
 }
 
 bones_of_st_peter = {
@@ -280,17 +279,24 @@ mjolnir = {
 			OR = {
 				religion = norse_pagan
 				religion = norse_pagan_reformed
-				religion = german_pagan
-				religion = german_pagan_reformed
 			}
 			is_landed = yes
 		}
 		additive_modifier = {
 			value = 100
+			religion = norse_pagan
+			is_landed = yes
+		}
+		additive_modifier = {
+			value = 5
 			OR = {
-				religion = norse_pagan
 				religion = german_pagan
+				religion = german_pagan_reformed
 			}
+		}
+		additive_modifier = {
+			value = 100
+			religion = german_pagan
 			is_landed = yes
 		}
 	}
@@ -325,6 +331,12 @@ andvaranaut = {
 			OR = {
 				religion = norse_pagan
 				religion = norse_pagan_reformed
+			}
+			is_landed = yes
+		}
+		additive_modifier = {
+			value = 5
+			OR = {
 				religion = german_pagan
 				religion = german_pagan_reformed
 			}
@@ -535,8 +547,8 @@ yada_tashy = {
 }
 
 ark_of_the_covenant = {
-    max_amount = 1
-    spawn_date = -1.1.1
+	max_amount = 1
+	spawn_date = -1.1.1
 
 	spawn_chance = {
 		value = 100
@@ -550,7 +562,7 @@ ark_of_the_covenant = {
 		}
 	}
 
-    weight = {
+	weight = {
 		value = 0
 		additive_modifier = {
 			value = 100
@@ -560,11 +572,11 @@ ark_of_the_covenant = {
 		}
 	}
 
-    artifacts = {
-        ark_of_the_covenant = {
-            value = 1
-        }
-    }
+	artifacts = {
+		ark_of_the_covenant = {
+			value = 1
+		}
+	}
 }
 
 ###################
@@ -594,22 +606,22 @@ crown_of_thorns = {
 			primary_title = {
 				title = c_jerusalem
 			}
-			NOT = { year = 1066 }
+			year < 1066
 		}
 		additive_modifier = {
 			value = 100
 			primary_title = {
 				title = e_byzantium
 			}
-			year = 1066
-			NOT = { year = 1238 }
+			year >= 1066
+			year < 1238
 		}
 		additive_modifier = {
 			value = 100
 			primary_title = {
 				title = k_france
 			}
-			year = 1238
+			year >= 1238
 		}
 	}
 
@@ -848,13 +860,18 @@ gjallarhorn = {
 		value = 0
 		additive_modifier = {
 			value = 100
-			is_landed = yes
 			OR = {
 				religion = norse_pagan
 				religion = norse_pagan_reformed
+			}
+			is_landed = yes
+		}
+		additive_modifier = {
+			OR = {
 				religion = german_pagan
 				religion = german_pagan_reformed
 			}
+			is_landed = yes
 		}
 	}
 

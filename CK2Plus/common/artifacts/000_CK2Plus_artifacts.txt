@@ -1,7 +1,7 @@
 #########
 #Plus Artifacts:
 #
-#achilles_spear - ancient_spartan_sword
+# achilles_spear - ancient_spartan_sword
 #
 #Total = 2
 #########

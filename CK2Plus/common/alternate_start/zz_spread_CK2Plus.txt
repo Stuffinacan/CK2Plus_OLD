@@ -1,0 +1,61 @@
+# CK2Plus additions
+
+culture_group_spread = {
+	# Boost groups with many individual cultures somewhat
+	modifier = {
+		factor = 1.5
+		OR = {
+			culture_group = amazingh
+			culture_group = central_germanic
+			culture_group = finno_ugric
+			culture_group = italian_group
+			culture_group = south_slavic
+		}
+		has_alternate_start_setting = {
+			setting = culture_group
+			NOT = { option = full_random }
+		}
+	}
+
+	# Boost groups with very many individual cultures even more
+	modifier = {
+		factor = 3
+		OR = {
+			culture_group = amazingh
+			culture_group = celtic
+			culture_group = central_germanic
+			culture_group = italian_group
+			culture_group = south_slavic
+		}
+		has_alternate_start_setting = {
+			setting = culture_group
+			NOT = { option = full_random }
+		}
+	}
+}
+
+religion_group_spread = {
+	modifier = {
+		factor = 25
+		OR = {
+			religion_group = hellenic_pagan_group
+			religion_group = egyptian_pagan_group
+			religion_group = mesoamerican_group
+		}
+		has_alternate_start_setting = {
+			setting = random_scenario_more_pagans
+			option = checked
+		}
+	}
+}
+
+religion_spread = {
+	modifier = {
+		factor = 0.1
+		religion = celtic_pagan
+		has_alternate_start_setting = {
+			setting = religion
+			NOT = { option = full_random }
+		}
+	}
+}

@@ -1,16 +1,17 @@
 ##########
 #Plus Artifacts:
 #
-#acchilles_spear - ancient_spartan_sword
+# achilles_spear
+# ancient_spartan_sword
 #
 #Total = 2
 ##########
 
-#Achilles_Spear
+# Achilles Spear
 achilles_spear = {
 	max_amount = 1
 	spawn_date = -1.1.1
-	
+
 	spawn_chance = {
 		value = 100
 		modifier = {
@@ -39,7 +40,7 @@ achilles_spear = {
 ancient_spartan_sword = {
 	max_amount = 3
 	spawn_date = -1.1.1
-	
+
 	spawn_chance = {
 		value = 100
 		modifier = {
@@ -61,7 +62,7 @@ ancient_spartan_sword = {
 	}
 
 	artifacts = {
-		achilles_spear = {
+		ancient_spartan_sword = {
 			value = 1
 		}
 	}
