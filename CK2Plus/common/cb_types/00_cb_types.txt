@@ -5,15 +5,15 @@ claim = {
 	sprite = 1
 	truce_days = 3650
 	hostile_against_others = yes
-	can_ask_to_join_war = yes
+	can_ask_to_join_war = no
+
+	allowed_to_target_tributaries = no
+
+	press_claim = yes
 
 	infamy_modifier = 0.85
 
 	sort_priority = 1000
-
-	allowed_to_target_tributaries = yes
-
-	press_claim = yes
 
 	can_use_gui = {
 		check_if_crusader_trigger = yes
@@ -22,157 +22,141 @@ claim = {
 	can_use_title = {
 		cb_can_use_preamble = yes
 		cb_no_nap_with_suzerain_trigger = yes
-		ROOT = { attacking_religious_head_trigger = no }
-		#AI non-adventurers will only press claims to different religion groups if the title is duke+
-		OR = {
-			ROOT = { ai = no }
-			higher_tier_than = count
-			ROOT = { religion_group = FROM }
-			ROOT = { has_character_flag = claimant_adventurer }
-		}
-		#disallow non-adventurer females from pressing claims unless they're already a ruler or they're non-muslim and the title is not agnatic
+		# Attacker
 		ROOT = {
-			OR = {
-				is_female = no
-				has_character_flag = claimant_adventurer
-				is_ruler = yes
-				AND = {
-					NOT = { religion_group = muslim }
-					NOT = { has_religion_feature = religion_patriarchal }
-				}
-				religion = druze
+			attacking_religious_head_trigger = no
+			# Adventurers
+			trigger_if = {
+				limit = { has_character_flag = claimant_adventurer }
+				always = yes
 			}
-			OR = {
-				is_female = yes
-				NOT = { has_religion_feature = religion_matriarchal }
-			}
-		}
-		#disallow females from pressing claims on agnatic nomadic titles
-		OR = {
-			ROOT = { ai = no }
-			FROM = { is_nomadic = no }
-			ROOT = { is_female = no }
-			NOT = { has_law = agnatic_succession }
-		}
-
-		OR = {
-			FROM = {
-				has_landed_title = PREV
-			}
-			holder_scope = {
-				is_liege_or_above = FROM
-			}
-		}
-		ROOT = {
-			OR = {
-				is_ruler = no
-				primary_title = {
+			trigger_else = {
+				# AI Restrictions
+				trigger_if = {
+					limit = { ai = yes }
+					# AI non-adventurers will only press claims to different religion groups if the title is duke+
 					OR = {
-						is_primary_type_title = no # Static Mercs, the Pope, Holy Orders, etc
-						higher_tier_than = PREVPREV
-						tier = PREVPREV
+						religion_group = FROM
+						PREV = { higher_tier_than = COUNT }
+					}
+					# Disallow females from pressing claims on agnatic nomadic titles
+					OR = {
+						FROM = { is_nomadic = no }
+						ROOT = { is_female = no }
+						PREV = { NOT = { has_law = agnatic_succession } }
+					}
+					#only cynics can press claims on same-faith holy orders unless one is a player
+					FROM = {
+						OR = {
+							ai = no
+							NOT = { religion = ROOT }
+							higher_tier_than = duke
+							holy_order = no
+							ROOT = { trait = cynical }
+						}
+					}
+					#AI will not fight for baronies held by a patriarch
+					can_attack_patriarch_trigger = yes
+				}
+				# Rulers can press their claims
+				trigger_if = {
+					limit = { is_ruler = no }
+					# gender requirements
+					trigger_if = {
+						limit = { is_female = yes }
+						NOR = {
+							AND = {
+								religion_group = muslim
+								NOT = { religion = druze }
+							}
+							has_religion_feature = religion_patriarchal
+						}
+					}
+					trigger_else = {
+						NOT = { has_religion_feature = religion_matriarchal }
+					}
+				}
+				# But not if they're too special
+				trigger_else = {
+					primary_title = {
+						OR = {
+							is_primary_type_title = no # Static Mercs, the Pope, Holy Orders, etc
+							NOT = { lower_tier_than = PREVPREV }
+						}
 					}
 				}
 			}
-		}
-		OR = {
-			ROOT = { has_strong_claim = PREV }
-			ROOT = { has_character_flag = claimant_adventurer  }
-			AND = {
-				ROOT = { has_weak_claim = PREV }
-				OR = {
-					is_contested = yes # is already being contested in some form of Claim or Succession War
-					is_pretender = yes # Checks vs ROOT character
-					holder_scope = { has_regent = yes }
-					AND = {
-						higher_tier_than = duke
-						holder_scope = { trait = uncrowned }
-					}
-					AND = {
-						succ_law_title = {
+			# What to do if the claim isn't strong
+			trigger_if = {
+				limit = {
+					NOT = { has_strong_claim = PREV }
+				}
+				has_weak_claim = PREV
+
+				PREV = { # claimed title
+					trigger_if = {
+						limit = {
 							NOR = {
-								has_law = enatic_succession
-								has_law = enatic_cognatic_succession
-								has_law = true_cognatic_succession
+								is_pretender = yes # Checks vs ROOT character
+								is_contested = yes # Already being contested in some war
+								holder_scope = { has_regent = yes }
 							}
 						}
-						holder_scope = { is_female = yes }
-					}
-					AND = {
-						succ_law_title = {
-							OR = {
-								has_law = enatic_succession
-								has_law = enatic_cognatic_succession
-							}
-						}
-						holder_scope = { is_female = no }
-					}
-					AND = {
-						ROOT = {
-							is_female = yes
-							culture = basque
-						}
-						OR = {
-							de_jure_liege_or_above = k_navarra
-							title = k_navarra
-						}
-					}
-					AND = {
-						ROOT = {
-							OR = {
-								is_female = no
-								has_religion_feature = religion_matriarchal
-								has_religion_feature = religion_equal
-								has_religion_feature = religion_feature_bon
-							}
-						}
-						holder_scope = {
-							AND = {
-								is_female = yes
-								NOR = {
+						ROOT = { # attacking claimant
+							trigger_if = {
+								limit = { is_female = yes }
+								OR = {
+									has_law = status_of_women_4
 									has_religion_feature = religion_matriarchal
 									has_religion_feature = religion_equal
 									has_religion_feature = religion_feature_bon
-									has_game_rule = { name = gender value = all }
-									has_game_rule = { name = gender value = plus }
+								}
+							}
+						}
+						holder_scope = { # title holder
+							is_female = yes
+							NOR = {
+								has_religion_feature = religion_matriarchal
+								has_religion_feature = religion_equal
+								has_religion_feature = religion_feature_bon
+								has_law = status_of_women_4
+								has_game_rule = {
+									name = gender
+									value = all
 								}
 							}
 						}
 					}
 				}
 			}
-		}
-		#only cynics or adventurers can press claims on same-faith holy orders unless one is a player
-		OR = {
-			ROOT = { has_character_flag = claimant_adventurer }
-			FROM = { NOT = { religion = ROOT } }
-			ROOT = { trait = cynical }
-			ROOT = { ai = no }
-			FROM = { ai = no }
-			FROM = { higher_tier_than = duke }
-			FROM = { holy_order = no }
-		}
-		#AI will not fight for baronies held by a patriarch
-		can_attack_patriarch_trigger = yes
-	}
-
-	is_valid_title = {
-		OR = {
-			FROM = {
-				has_landed_title = PREV
+			# Strong claims get a pass
+			trigger_else = {
+				has_strong_claim = PREV
 			}
-			holder_scope = {
+		}
+
+		holder_scope = {
+			OR = {
+				character = FROM
 				is_liege_or_above = FROM
 			}
 		}
+	}
+
+	is_valid_title = {
+		# Attacker
 		ROOT = { has_claim = PREV }
+
+		holder_scope = {
+			OR = {
+				character = FROM
+				is_liege_or_above = FROM
+			}
+		}
 	}
 
 	on_add = {
-		hidden_tooltip = { fire_haruspicy_event_effect = yes }
-		FROM = {
-			attacked_tributary_cb_effect = yes
-		}
+		fire_haruspicy_event_effect = yes
 		if = {
 			limit = { defender = { is_offmap_governor = offmap_china } }
 			attacker = {
@@ -184,15 +168,34 @@ claim = {
 
 	on_success_title = {
 		log = "[Root.GetBestName] (ID: [Root.GetID]) succeeded with their Claim war on the [This.GetFullName] against [From.GetBestName] (ID: [From.GetID])"
-		ROOT = {
-			add_character_modifier = { name = victory_timer duration = 1 hidden = yes }
-			pf_glory_plus2_effect = yes
-		}
+
 		#decentralize target realm
 		title_reduce_CA_effect = yes
 		title_reduce_TO_effect = yes
+		empty_province_effect = yes
+		pf_liege_change_under_title_begin_effect = yes
+		pf_liege_change_under_title_end_effect = yes
+
+		usurp_title_plus_barony_if_unlanded = { target = attacker type = claim }
+
+		attacker = {
+			show_scope_change = no
+			participation_scaled_prestige = 100
+			add_character_modifier = { name = victory_timer duration = 1 hidden = yes }
+			pf_glory_plus2_effect = yes
+		}
+		any_attacker = {
+			limit = { NOT = { character = attacker } }
+			hidden_tooltip = { participation_scaled_prestige = 100 }
+		}
+
+		defender = {
+			show_scope_change = no
+			prestige = -100
+		}
+
 		hidden_tooltip = {
-			ROOT = {
+			attacker = {
 				clr_character_flag = claimant_adventurer
 				if = {
 					limit = {
@@ -205,114 +208,91 @@ claim = {
 					}
 				}
 			}
-		}
-		empty_province_effect = yes
-		pf_liege_change_under_title_begin_effect = yes
-		usurp_title_plus_barony_if_unlanded = { target = ROOT type = claim }
-		pf_liege_change_under_title_end_effect = yes
-		if = {
-			limit = {
-				higher_tier_than = BARON
-				NOT = { culture = ROOT }
-			}
-			hidden_tooltip = { conquest_culture = ROOT }
-		}
-		ROOT = {
-			show_scope_change = no
-			participation_scaled_prestige = 200
-		}
-		any_attacker = {
-			limit = { NOT = { character = ROOT } }
-			hidden_tooltip = { participation_scaled_prestige = 200 }
-		}
-		FROM = {
-			show_scope_change = no
-			prestige = -100
-			pf_glory_minus2_effect = yes
-		}
 
-		hidden_tooltip = {
-			check_war_effect = yes
-			FROM = {
+			defender = {
 				landless_pope_effect = yes
 			}
+
+			if = {
+				limit = {
+					higher_tier_than = BARON
+					NOT = { culture = ROOT }
+				}
+				conquest_culture = attacker
+			}
+
+			check_war_effect = yes
 		}
 	}
 
 	on_fail_title = {
-		ROOT = {
+		attacker = {
 			show_scope_change = no
 			prestige = -100
 			hidden_tooltip = {
-				if = {
-					limit = { has_character_flag = claimant_adventurer }
-					disband_event_forces = yes
-					clr_character_flag = claimant_adventurer
-				}
+				disband_event_forces = yes
+				clr_character_flag = claimant_adventurer
 			}
 		}
-		FROM = {
+
+		defender = {
 			show_scope_change = no
 			participation_scaled_prestige = 100
 		}
 		any_defender = {
-			limit = { NOT = { character = FROM } }
+			limit = { NOT = { character = defender } }
 			hidden_tooltip = { participation_scaled_prestige = 100 }
 		}
 	}
 
 	on_reverse_demand = {
-		FROM = {
+		attacker = {
 			show_scope_change = no
-			add_character_modifier = { name = victory_timer duration = 1 hidden = yes }
-			pf_glory_plus2_effect = yes
-		}
-		ROOT = {
-			show_scope_change = no
-			prestige = -200
+			prestige = -150
 			transfer_scaled_wealth = {
-				to = FROM
+				to = defender
 				value = 4.0
 			}
-			pf_glory_minus2_effect = yes
-		}
-		if = {
-			limit = {
-				ROOT = { has_character_flag = claimant_adventurer }
+			if = {
+				limit = { has_character_flag = claimant_adventurer }
+				imprison = defender
 			}
-			ROOT = { imprison = FROM }
+		}
+
+		defender = {
+			show_scope_change = no
+			participation_scaled_prestige = 150
 		}
 		any_defender = {
-			limit = { character = FROM }
-			participation_scaled_prestige = 200
+			limit = { NOT = { character = defender } }
+			hidden_tooltip = { participation_scaled_prestige = 150 }
 		}
-		any_defender = {
-			limit = { NOT = { character = FROM } }
-			hidden_tooltip = { participation_scaled_prestige = 200 }
-		}
+
+		# China stuff
 		hidden_effect = {
-			ROOT = {
+			# Attacker
+			attacker = {
 				if = {
 					limit = {
 						has_landed_title = e_china_west_governor
 					}
 					log = "China War Logging: China lost a claim war against [From.GetBestName]"
-				}
-				if = { #Makes China have a chance of leaving Expanionist policy...
-					limit = {
-						has_landed_title = e_china_west_governor
-						offmap_china = {
-							has_policy = china_expansionist
+
+					if = { #Makes China have a chance of leaving Expanionist policy...
+						limit = {
+							offmap_china = {
+								has_policy = china_expansionist
+							}
 						}
-					}
-					random = {
-						chance = 50
-						offmap_china = {
-							set_policy = china_open
-							log = "-------------------------------------"
-							log = "China Policy Logging:"
-							log = "Chinas new Policy is now OPEN"
-							log = "-------------------------------------"
+						random = {
+							chance = 50
+							offmap_china = {
+								set_policy = china_open
+								log = "-------------------------------------"
+								log = "China Policy Logging:"
+								log = "China's new Policy is now OPEN"
+								log = "-------------------------------------"
+							}
 						}
 					}
 				}
@@ -321,41 +301,39 @@ claim = {
 	}
 
 	on_reverse_demand_title = {
-		ROOT = {
+		attacker = {
 			show_scope_change = no
 			remove_claim = PREV
 			hidden_tooltip = {
-				if = {
-					limit = { has_character_flag = claimant_adventurer }
-					disband_event_forces = yes
-					clr_character_flag = claimant_adventurer
-				}
+				disband_event_forces = yes
+				clr_character_flag = claimant_adventurer
 			}
 		}
 	}
 
 	on_attacker_leader_death = {
 		if = {
-			limit = { ROOT = { has_character_flag = EoD_prophet_attacker } }
-			FROM = { narrative_event = { id = RIP.15116 } }
-		}
-		if = {
 			limit = {
-				ROOT = {
+				attacker = { has_character_flag = EoD_prophet_attacker }
+			}
+			defender = { narrative_event = { id = RIP.15116 } }
+		}
+
+		attacker = {
+			if = {
+				limit = {
 					OR = {
 						has_character_flag = claimant_adventurer
 						has_character_flag = EoD_prophet_attacker
 					}
 				}
-			}
-			ROOT = {
 				hidden_tooltip = {
-					disband_event_forces = claimant_adventurer
+					disband_event_forces = yes
 					clr_character_flag = claimant_adventurer
 					clr_character_flag = EoD_prophet_attacker
 				}
+				PREV = { end_war = invalid }
 			}
-			end_war = invalid
 		}
 	}
 
@@ -381,6 +359,8 @@ claim = {
 
 	ai_will_do = {
 		factor = 1
+		sufficient_treasury_for_war = yes
+
 		modifier = {
 			factor = 1.2
 			ROOT = {
@@ -402,7 +382,6 @@ claim = {
 				NOT = { realm_size = 1 }
 			}
 		}
-		sufficient_treasury_for_war = yes
 	}
 }
 
@@ -23640,5 +23619,3 @@ reconquista_balearic = {
 		factor = 100
 	}
 }
-
-
